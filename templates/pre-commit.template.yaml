@@ -1,0 +1,19 @@
+# [变更日志]
+# 修改时间：{{DATE}}
+# AI模型：{{MODEL}}
+# 修改内容：[v1.0 初版：项目地图防漂移 pre-commit 片段——提交前强制跑六层自检，把收口闸门从"自觉"升级为"流水线强制"]
+#
+# 用法：
+#   1. 复制到目标项目根目录 .pre-commit-config.yaml（若已有该文件，只合并 repos 段）
+#   2. 目标项目执行：pip install pre-commit && pre-commit install
+#   3. 之后每次 git commit 自动运行 scripts/test_project_map.py，红灯阻断提交
+repos:
+  - repo: local
+    hooks:
+      - id: project-map-check
+        name: project-map 六层自检（防漂移闸门）
+        entry: python scripts/test_project_map.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]

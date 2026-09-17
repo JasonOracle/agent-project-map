@@ -1,0 +1,15 @@
+# 本地工具数据（不入库）
+.codebuddy/
+.claude/
+
+# Python 运行产物
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 编辑器与系统文件
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
