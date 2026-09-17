@@ -2,7 +2,7 @@
 [变更日志]
 修改时间：2026-09-17
 AI模型：GLM (CodeBuddy)
-修改内容：[v1.0：技能更名 scan-project-map → agent-project-map（GitHub 查重零撞车）；自检体系四层升级六层（+防饿死、+防语义欠账）；设计契约六条扩八条；目录树补 pre-commit.template.yaml]
+修改内容：[v1.0：技能更名 scan-project-map → agent-project-map（GitHub 查重零撞车）；自检体系四层升级六层（+防饿死、+防语义欠账）；设计契约六条扩八条；目录树补 pre-commit.template.yaml。v1.1：自检脚本双运行时（Python 权威主版 + Node 兼容镜像，六层断言功能等价），无 Python 环境优雅降级]
 -->
 
 # agent-project-map
@@ -54,6 +54,8 @@ git clone https://github.com/JasonOracle/agent-project-map.git .claude/skills/ag
 
 地图严重腐烂时的逃生舱（Phase R）：结构按新扫描重建，语义层（职责/陷阱/待确认）导出给你逐条裁决后平移，绝不静默丢弃。
 
+**运行时自动适配**：自检脚本有 Python 版（权威主版，断言升级优先落地）与 Node 版（兼容镜像，六层断言功能等价）。安装时自动检测：有 Python 用 Python；没有则询问——可现场安装（Windows `winget install Python.Python.3` / macOS `brew install python3`），或改用 Node 版（纯前端项目天然满足，Node ≥ 14）。
+
 ## 生成后的维护规则（写给未来的 AI 和你）
 
 - 目录**增删移**时：同步地图的 `map-paths` 清单块，顺手跑 `python scripts/test_project_map.py`（5 秒）
@@ -70,7 +72,8 @@ agent-project-map/
 ├── SKILL.md                                 # 技能主指令（七阶段流程 + 逃生舱 + 八条设计契约）
 ├── templates/
 │   ├── project-map.template.md              # 地图模板（占位符版，头部含八条设计契约）
-│   ├── test_project_map.template.py         # 自检脚本模板（六层断言，常量配置区可移植）
+│   ├── test_project_map.template.py         # 自检脚本 Python 版（权威主版，六层断言）
+│   ├── test_project_map.template.js         # 自检脚本 Node 兼容版（功能等价镜像）
 │   └── pre-commit.template.yaml             # 防漂移 pre-commit 片段（可选接入）
 ├── README.md
 └── LICENSE

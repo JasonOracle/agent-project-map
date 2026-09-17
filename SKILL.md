@@ -7,7 +7,7 @@ description: 为任意项目生成「项目地图 + 六层断言守护（防漂�
 [变更日志]
 修改时间：2026-09-17
 AI模型：GLM (CodeBuddy)
-修改内容：[v1.0：设计契约 6 条扩为 8 条（#5 分层可再生、#6 待确认双机制、#7 产物区标注约定、#8 歧义标准）；Phase 1 新增准则文件探测默认值；Phase 4 常量区清单更新；Phase 5 三类裁决扩为四类（新增饿死风险）；Phase 6 规则 3 补产物区豁免代价说明；新增 Phase R 逃生舱；自检体系从四层升级为六层；技能更名 scan-project-map → agent-project-map（GitHub 查重零撞车，守护卖点前置至 description 首句）；aiservice 项目实测反馈修复：Phase 3 清单禁登工具数据目录（.codebuddy/.claude 等 skills 安装位置），防工具重装后的声明失效误报]
+修改内容：[v1.0：设计契约 6 条扩为 8 条（#5 分层可再生、#6 待确认双机制、#7 产物区标注约定、#8 歧义标准）；Phase 1 新增准则文件探测默认值；Phase 4 常量区清单更新；Phase 5 三类裁决扩为四类（新增饿死风险）；Phase 6 规则 3 补产物区豁免代价说明；新增 Phase R 逃生舱；自检体系从四层升级为六层；技能更名 scan-project-map → agent-project-map（GitHub 查重零撞车，守护卖点前置至 description 首句）；aiservice 项目实测反馈修复：Phase 3 清单禁登工具数据目录（.codebuddy/.claude 等 skills 安装位置），防工具重装后的声明失效误报；v1.1：自检脚本双运行时——新增 Node 兼容版模板（Python 主版/JS 镜像，六层断言功能等价），Phase 0 检测运行时并优雅降级，Phase 4/5 按运行时适配]
 -->
 
 # Scan Project Map — 项目地图生成器
@@ -28,7 +28,10 @@ AI模型：GLM (CodeBuddy)
 ## 执行流程（七阶段 + 逃生舱，严格按序）
 
 ### Phase 0 — 前置确认
-确认目标项目根目录；确认 Python 3 可用（跑自检脚本用）。若不可用，停下来与用户协商替代方案。
+确认目标项目根目录；**检测自检脚本运行时**（优先 Python，Node 为兼容降级）：
+- 探测 Python 3：`python --version` / `python3 --version`（Windows 另试 `py -3`）
+- **有 Python** → 选用 Python 版自检（权威主版：断言升级优先落地，守护最完整）
+- **无 Python** → 如实告知用户：「自检脚本需要运行时。**Python 是权威主版**（断言升级优先落地）；**Node 是兼容镜像**（六层断言功能等价，仅断言更新可能滞后）。也可现在安装 Python：Windows `winget install Python.Python.3` / macOS `brew install python3`。」用户拒绝安装且项目有 Node（`node --version` ≥ 14）→ 选用 Node 兼容版；两者皆无 → 给安装指引后停止，**不得跳过自检**
 
 ### Phase 1 — 自主扫描（先扫后问，问题才有质量）
 - 列出项目 2~3 层目录结构（跳过 node_modules、__pycache__、dist、build、点目录）
@@ -58,11 +61,11 @@ AI模型：GLM (CodeBuddy)
 6. **待确认区**：仅登记人主动承认未查明的目录（机器红灯追加的走清单块内联【待确认】标记，勿写入本节）
 
 ### Phase 4 — 生成自检脚本
-复制 `templates/test_project_map.template.py` 到项目 `scripts/` 目录（无则创建）改名 `test_project_map.py`，配置文件顶部的常量区（MAP_NAME、RULE_FILES、ACTIVE_PARENTS、IGNORE、AGENT_REFERENCES、PENDING_BUDGET）。**IGNORE 只放纯机械缓存**（node_modules、venv、dist 等），运行产物/资源区一律走清单块标注，勿回填名字黑名单。
+按 Phase 0 选定的运行时复制 `templates/test_project_map.template.py` 或 `.js` 到项目 `scripts/` 目录（无则创建）改名 `test_project_map.py`（或 `.js`），配置文件顶部的常量区（MAP_NAME、RULE_FILES、ACTIVE_PARENTS、IGNORE、AGENT_REFERENCES、PENDING_BUDGET）。**AGENT_REFERENCES 与地图清单块中的脚本名跟随所选运行时**。**IGNORE 只放纯机械缓存**（node_modules、venv、dist 等），运行产物/资源区一律走清单块标注，勿回填名字黑名单。
 
 ### Phase 5 — 运行至全绿（预期管理：首跑大概率抓到东西）
 ```
-python scripts/test_project_map.py
+python scripts/test_project_map.py     # Node 版运行时则为: node scripts/test_project_map.js
 ```
 红灯逐个裁决，四类处理：
 - **未登记的新目录** → 问用户是有效结构（登记入清单；运行产物/资源目录注释以 `产物区`/`资源区` 开头）还是残留（删除）。红灯输出里已附可复制答案行，粘贴后补语义即可
